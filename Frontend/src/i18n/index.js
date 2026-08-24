@@ -1,0 +1,131 @@
+import i18next from 'i18next'
+import { initReactI18next } from 'react-i18next'
+
+const resources = {
+  en: {
+    translation: {
+      nav_home: 'Home', nav_search: 'Search', nav_categories: 'Categories', nav_mood: 'Mood',
+      nav_community: 'Community', nav_games: 'Games', nav_leaderboard: 'Leaderboard',
+      nav_library: 'My Library', nav_stats: 'Stats', nav_signin: 'Sign In', nav_admin: 'Admin', nav_signout: 'Sign Out', nav_collections: 'Collections', nav_calendar: 'Calendar',
+      hero_title: 'Find what to watch tonight', hero_subtitle: 'Trending picks, smart search, and an AI assistant that actually gets your mood — all under one marquee.',
+      hero_cta_search: 'Start Searching', hero_cta_browse: 'Browse Categories',
+      section_trending: 'Trending This Week', section_popular: 'Popular Movies', section_now_playing: 'Now Playing',
+      section_upcoming: 'Upcoming', section_top_rated: 'Top Rated',
+      btn_favorite: 'Favorite', btn_favorited: 'Favorited', btn_watchlist: 'Watchlist', btn_in_watchlist: 'In Watchlist',
+      btn_mark_watched: 'Mark Watched', btn_watched: 'Watched', btn_signin_prompt: 'Sign in to save this to your library.',
+      auth_welcome_back: 'Welcome Back', auth_signin_subtitle: 'Sign in to pick up where you left off.',
+      auth_join: 'Join MovieTime', auth_email: 'Email', auth_password: 'Password',
+      skip_to_content: 'Skip to main content',
+      accessibility_title: 'Accessibility', accessibility_high_contrast: 'High-contrast mode',
+      accessibility_font_size: 'Font size', accessibility_language: 'Language',
+    },
+  },
+  es: {
+    translation: {
+      nav_home: 'Inicio', nav_search: 'Buscar', nav_categories: 'Categorías', nav_mood: 'Estado de ánimo',
+      nav_community: 'Comunidad', nav_games: 'Juegos', nav_leaderboard: 'Clasificación',
+      nav_library: 'Mi Biblioteca', nav_stats: 'Estadísticas', nav_signin: 'Iniciar sesión', nav_admin: 'Admin', nav_signout: 'Cerrar sesión', nav_collections: 'Colecciones', nav_calendar: 'Calendario',
+      hero_title: 'Encuentra qué ver esta noche', hero_subtitle: 'Tendencias, búsqueda inteligente y un asistente de IA que entiende tu estado de ánimo.',
+      hero_cta_search: 'Empezar a buscar', hero_cta_browse: 'Ver categorías',
+      section_trending: 'Tendencias esta semana', section_popular: 'Películas populares', section_now_playing: 'En cartelera',
+      section_upcoming: 'Próximamente', section_top_rated: 'Mejor valoradas',
+      btn_favorite: 'Favorito', btn_favorited: 'Favorito ✓', btn_watchlist: 'Lista', btn_in_watchlist: 'En la lista',
+      btn_mark_watched: 'Marcar como vista', btn_watched: 'Vista', btn_signin_prompt: 'Inicia sesión para guardar esto en tu biblioteca.',
+      auth_welcome_back: 'Bienvenido de nuevo', auth_signin_subtitle: 'Inicia sesión para continuar.',
+      auth_join: 'Únete a MovieTime', auth_email: 'Correo electrónico', auth_password: 'Contraseña',
+      skip_to_content: 'Saltar al contenido principal',
+      accessibility_title: 'Accesibilidad', accessibility_high_contrast: 'Modo alto contraste',
+      accessibility_font_size: 'Tamaño de fuente', accessibility_language: 'Idioma',
+    },
+  },
+  fr: {
+    translation: {
+      nav_home: 'Accueil', nav_search: 'Recherche', nav_categories: 'Catégories', nav_mood: 'Humeur',
+      nav_community: 'Communauté', nav_games: 'Jeux', nav_leaderboard: 'Classement',
+      nav_library: 'Ma Bibliothèque', nav_stats: 'Statistiques', nav_signin: 'Connexion', nav_admin: 'Admin', nav_signout: 'Se déconnecter', nav_collections: 'Collections', nav_calendar: 'Calendrier',
+      hero_title: 'Trouvez quoi regarder ce soir', hero_subtitle: 'Tendances, recherche intelligente et un assistant IA qui comprend votre humeur.',
+      hero_cta_search: 'Commencer la recherche', hero_cta_browse: 'Parcourir les catégories',
+      section_trending: 'Tendances cette semaine', section_popular: 'Films populaires', section_now_playing: "À l'affiche",
+      section_upcoming: 'À venir', section_top_rated: 'Les mieux notés',
+      btn_favorite: 'Favori', btn_favorited: 'Favori ✓', btn_watchlist: 'Liste', btn_in_watchlist: 'Dans la liste',
+      btn_mark_watched: 'Marquer comme vu', btn_watched: 'Vu', btn_signin_prompt: 'Connectez-vous pour enregistrer.',
+      auth_welcome_back: 'Bon retour', auth_signin_subtitle: 'Connectez-vous pour continuer.',
+      auth_join: 'Rejoindre MovieTime', auth_email: 'E-mail', auth_password: 'Mot de passe',
+      skip_to_content: 'Passer au contenu principal',
+      accessibility_title: 'Accessibilité', accessibility_high_contrast: 'Mode contraste élevé',
+      accessibility_font_size: 'Taille de police', accessibility_language: 'Langue',
+    },
+  },
+  hi: {
+    translation: {
+      nav_home: 'होम', nav_search: 'खोजें', nav_categories: 'श्रेणियाँ', nav_mood: 'मूड',
+      nav_community: 'समुदाय', nav_games: 'गेम्स', nav_leaderboard: 'लीडरबोर्ड',
+      nav_library: 'मेरी लाइब्रेरी', nav_stats: 'आँकड़े', nav_signin: 'साइन इन करें', nav_admin: 'एडमिन', nav_signout: 'साइन आउट करें', nav_collections: 'संग्रह', nav_calendar: 'कैलेंडर',
+      hero_title: 'आज रात क्या देखें, ढूंढें', hero_subtitle: 'ट्रेंडिंग पिक्स, स्मार्ट सर्च और एक AI सहायक जो आपके मूड को समझता है।',
+      hero_cta_search: 'खोजना शुरू करें', hero_cta_browse: 'श्रेणियाँ ब्राउज़ करें',
+      section_trending: 'इस हफ्ते ट्रेंडिंग', section_popular: 'लोकप्रिय फ़िल्में', section_now_playing: 'अभी चल रही हैं',
+      section_upcoming: 'आने वाली', section_top_rated: 'शीर्ष रेटेड',
+      btn_favorite: 'पसंदीदा', btn_favorited: 'पसंदीदा ✓', btn_watchlist: 'वॉचलिस्ट', btn_in_watchlist: 'वॉचलिस्ट में',
+      btn_mark_watched: 'देखा हुआ चिह्नित करें', btn_watched: 'देखा गया', btn_signin_prompt: 'लाइब्रेरी में सहेजने के लिए साइन इन करें।',
+      auth_welcome_back: 'वापसी पर स्वागत है', auth_signin_subtitle: 'जारी रखने के लिए साइन इन करें।',
+      auth_join: 'MovieTime से जुड़ें', auth_email: 'ईमेल', auth_password: 'पासवर्ड',
+      skip_to_content: 'मुख्य सामग्री पर जाएँ',
+      accessibility_title: 'सुगम्यता', accessibility_high_contrast: 'हाई-कॉन्ट्रास्ट मोड',
+      accessibility_font_size: 'फ़ॉन्ट आकार', accessibility_language: 'भाषा',
+    },
+  },
+  ja: {
+    translation: {
+      nav_home: 'ホーム', nav_search: '検索', nav_categories: 'カテゴリー', nav_mood: '気分',
+      nav_community: 'コミュニティ', nav_games: 'ゲーム', nav_leaderboard: 'ランキング',
+      nav_library: 'マイライブラリ', nav_stats: '統計', nav_signin: 'サインイン', nav_admin: '管理者', nav_signout: 'サインアウト', nav_collections: 'コレクション', nav_calendar: 'カレンダー',
+      hero_title: '今夜見るものを見つけよう', hero_subtitle: 'トレンド作品、スマート検索、そしてあなたの気分に寄り添うAIアシスタント。',
+      hero_cta_search: '検索を始める', hero_cta_browse: 'カテゴリーを見る',
+      section_trending: '今週のトレンド', section_popular: '人気の映画', section_now_playing: '上映中',
+      section_upcoming: '公開予定', section_top_rated: '高評価',
+      btn_favorite: 'お気に入り', btn_favorited: 'お気に入り済み', btn_watchlist: 'ウォッチリスト', btn_in_watchlist: '追加済み',
+      btn_mark_watched: '視聴済みにする', btn_watched: '視聴済み', btn_signin_prompt: 'ライブラリに保存するにはサインインしてください。',
+      auth_welcome_back: 'おかえりなさい', auth_signin_subtitle: 'サインインして続ける。',
+      auth_join: 'MovieTimeに参加', auth_email: 'メール', auth_password: 'パスワード',
+      skip_to_content: 'メインコンテンツへスキップ',
+      accessibility_title: 'アクセシビリティ', accessibility_high_contrast: 'ハイコントラストモード',
+      accessibility_font_size: '文字サイズ', accessibility_language: '言語',
+    },
+  },
+  de: {
+    translation: {
+      nav_home: 'Startseite', nav_search: 'Suche', nav_categories: 'Kategorien', nav_mood: 'Stimmung',
+      nav_community: 'Community', nav_games: 'Spiele', nav_leaderboard: 'Bestenliste',
+      nav_library: 'Meine Bibliothek', nav_stats: 'Statistiken', nav_signin: 'Anmelden', nav_admin: 'Admin', nav_signout: 'Abmelden', nav_collections: 'Sammlungen', nav_calendar: 'Kalender',
+      hero_title: 'Finde heute Abend etwas zu sehen', hero_subtitle: 'Trends, intelligente Suche und ein KI-Assistent, der deine Stimmung versteht.',
+      hero_cta_search: 'Suche starten', hero_cta_browse: 'Kategorien durchsuchen',
+      section_trending: 'Trends diese Woche', section_popular: 'Beliebte Filme', section_now_playing: 'Im Kino',
+      section_upcoming: 'Demnächst', section_top_rated: 'Bestbewertet',
+      btn_favorite: 'Favorit', btn_favorited: 'Favorisiert', btn_watchlist: 'Merkliste', btn_in_watchlist: 'Auf Merkliste',
+      btn_mark_watched: 'Als gesehen markieren', btn_watched: 'Gesehen', btn_signin_prompt: 'Melde dich an, um dies zu speichern.',
+      auth_welcome_back: 'Willkommen zurück', auth_signin_subtitle: 'Melde dich an, um fortzufahren.',
+      auth_join: 'MovieTime beitreten', auth_email: 'E-Mail', auth_password: 'Passwort',
+      skip_to_content: 'Zum Hauptinhalt springen',
+      accessibility_title: 'Barrierefreiheit', accessibility_high_contrast: 'Hoher Kontrast',
+      accessibility_font_size: 'Schriftgröße', accessibility_language: 'Sprache',
+    },
+  },
+}
+
+i18next.use(initReactI18next).init({
+  resources,
+  lng: localStorage.getItem('movietime_language') || 'en',
+  fallbackLng: 'en',
+  interpolation: { escapeValue: false },
+})
+
+export const SUPPORTED_LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'fr', label: 'Français' },
+  { code: 'hi', label: 'हिन्दी' },
+  { code: 'ja', label: '日本語' },
+  { code: 'de', label: 'Deutsch' },
+]
+
+export default i18next
