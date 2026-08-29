@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+###Private Firebase Key###
+src/main/resources/firebase-service-account.json
+# or simply ignore by filename:
+firebase-service-account.json
