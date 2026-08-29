@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+
 @Service
 @Slf4j
 public class TmdbService {
@@ -87,7 +89,7 @@ public class TmdbService {
                 .bodyToMono(JsonNode.class);
     }
 
-    /** Upcoming/recent movies featuring a given cast member - used to detect "favorite actor's new movie". */
+    /** Upcoming/recent movies featuring a given cast member. */
     public Mono<JsonNode> discoverByCast(long personId) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
@@ -95,21 +97,16 @@ public class TmdbService {
                         .queryParam("api_key", apiKey)
                         .queryParam("with_cast", personId)
                         .queryParam("sort_by", "primary_release_date.desc")
-                        .queryParam("primary_release_date.lte",
-                                java.time.LocalDate.now().plusMonths(6).toString())
+                        .queryParam("primary_release_date.lte", LocalDate.now().plusMonths(6).toString())
                         .build())
                 .retrieve()
                 .bodyToMono(JsonNode.class);
     }
 
-    /**
-     * General-purpose discover with the full Phase 2 filter set:
-     * genre, release year, language, minimum rating, runtime range, country, sort order.
-     * Any parameter left null is simply omitted from the TMDB query.
-     */
+    /** General-purpose discover with full filter set. */
     public Mono<JsonNode> discoverMovies(Integer genreId, Integer year, String language,
-                                          Double minRating, Integer minRuntime, Integer maxRuntime,
-                                          String country, String sortBy, int page) {
+                                         Double minRating, Integer minRuntime, Integer maxRuntime,
+                                         String country, String sortBy, int page) {
         return webClient.get()
                 .uri(uriBuilder -> {
                     uriBuilder.path("/discover/movie")
@@ -228,18 +225,6 @@ public class TmdbService {
                 .bodyToMono(JsonNode.class);
     }
 
-    /** Looks up a TMDB keyword id by text (e.g. "christmas") for use with discoverByKeyword. */
-    public Mono<JsonNode> searchKeyword(String query) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/search/keyword")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("query", query)
-                        .build())
-                .retrieve()
-                .bodyToMono(JsonNode.class);
-    }
-
     public Mono<JsonNode> discoverByKeywordAndGenre(Long keywordId, Integer genreId, int page) {
         return webClient.get()
                 .uri(uriBuilder -> {
@@ -251,37 +236,6 @@ public class TmdbService {
                     if (genreId != null) uriBuilder.queryParam("with_genres", genreId);
                     return uriBuilder.build();
                 })
-                .retrieve()
-                .bodyToMono(JsonNode.class);
-    }
-
-    /** Movies releasing within a date range - powers the release calendar. */
-    public Mono<JsonNode> discoverByDateRange(String fromDate, String toDate, int page) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/discover/movie")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("primary_release_date.gte", fromDate)
-                        .queryParam("primary_release_date.lte", toDate)
-                        .queryParam("sort_by", "primary_release_date.asc")
-                        .queryParam("page", page)
-                        .build())
-                .retrieve()
-                .bodyToMono(JsonNode.class);
-    }
-
-    /** Family-friendly discover - genre + a lenient US certification ceiling. */
-    public Mono<JsonNode> discoverFamilyFriendly(int page) {
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/discover/movie")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("with_genres", 10751)
-                        .queryParam("certification_country", "US")
-                        .queryParam("certification.lte", "PG")
-                        .queryParam("sort_by", "popularity.desc")
-                        .queryParam("page", page)
-                        .build())
                 .retrieve()
                 .bodyToMono(JsonNode.class);
     }
