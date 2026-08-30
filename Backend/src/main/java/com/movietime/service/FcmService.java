@@ -7,8 +7,9 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import com.movietime.model.DeviceToken;
 import com.movietime.repository.DeviceTokenRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -16,12 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class FcmService {
 
     private final FirebaseApp firebaseApp;
     private final DeviceTokenRepository deviceTokenRepository;
+
+    @Autowired
+    public FcmService(@Nullable FirebaseApp firebaseApp, DeviceTokenRepository deviceTokenRepository) {
+        this.firebaseApp = firebaseApp;
+        this.deviceTokenRepository = deviceTokenRepository;
+    }
 
     public boolean isEnabled() {
         return firebaseApp != null;
