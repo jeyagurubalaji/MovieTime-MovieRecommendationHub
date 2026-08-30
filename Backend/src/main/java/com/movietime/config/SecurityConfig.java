@@ -30,6 +30,14 @@ public class SecurityConfig {
     private String allowedOrigins;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            // Swagger / OpenAPI documentation
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/webjars/**",
+
+            // Public API routes
             "/api/auth/**",
             "/api/movies/**",
             "/api/search/**",
