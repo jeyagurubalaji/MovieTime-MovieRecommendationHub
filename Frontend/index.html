@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MovieTime — Find what to watch tonight</title>
+    <meta name="description" content="MovieTime is a movie recommendation hub with smart search, personalized picks, and an AI movie assistant." />
+    <link rel="icon" type="image/x-icon" href="src/assets/movie.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  </head>
+  <body>
+  <!-- Hidden Google Translate Element -->
+  <div id="google_translate_element" style="display:none;"></div>
+
+  <!-- Clean UI overrides to hide Google's default banner & popups -->
+  <style>
+    /* Added iframe.skiptranslate to block the modern Google Translate top bar */
+    iframe.skiptranslate,
+    .goog-te-banner-frame.skiptranslate,
+    .goog-te-banner-frame,
+    #goog-gt-tt,
+    .goog-te-balloon-frame {
+      display: none !important;
+    }
+
+    /* Forces the body to stay at the top instead of being pushed down by the hidden banner */
+    body {
+      top: 0px !important;
+    }
+
+    .goog-text-highlight {
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    font {
+      background-color: transparent !important;
+      box-shadow: none !important;
+    }
+  </style>
+
+  <!-- Google Translate Engine -->
+  <script type="text/javascript">
+    function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+    {
+      pageLanguage: 'en',
+      autoDisplay: false
+    },
+      'google_translate_element'
+    );
+    }
+  </script>
+
+  <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  <!-- Google Identity Services Script for Authentication -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  </body>
+</html>
