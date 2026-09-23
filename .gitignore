@@ -1,0 +1,80 @@
+# ==========================================
+# Operating System & IDE / Editor Metadata
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+*.swp
+*.swo
+
+# ==========================================
+# Global Secret Environment Files
+# ==========================================
+# Ignores all actual secret environment files while preserving .env.example
+.env
+*.env
+.env.local
+.env.development.local
+.env.production.local
+*.pem
+*.key
+
+# ==========================================
+# Frontend (React / Vite / Node)
+# ==========================================
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.cache/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# ==========================================
+# Backend (Spring Boot / Maven / Gradle / Eclipse)
+# ==========================================
+backend/target/
+backend/build/
+backend/.gradle/
+backend/*.class
+backend/*.jar
+backend/*.war
+backend/*.ear
+backend/*.log
+backend/src/main/resources/firebase-service-account.json
+backend/firebase-service-account.json
+
+# Retain Maven Wrapper for cloud CI/CD builds
+!.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse & NetBeans project metadata
+backend/.apt_generated
+backend/.classpath
+backend/.factorypath
+backend/.project
+backend/.settings/
+backend/.springBeans
+backend/.sts4-cache
+backend/nbproject/private/
+backend/nbbuild/
+backend/dist/
+backend/nbdist/
+backend/.nb-gradle/
+
+# ==========================================
+# AI Service (Python / FastAPI)
+# ==========================================
+ai-service/venv/
+ai-service/.venv/
+ai-service/env/
+ai-service/__pycache__/
+ai-service/*.py[cod]
+ai-service/*$py.class
+ai-service/.pytest_cache/
+ai-service/.coverage
+ai-service/htmlcov/
