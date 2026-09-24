@@ -19,6 +19,8 @@ def is_available() -> bool:
     return client is not None
 
 async def complete(system: str, user_message: str, max_tokens: int = 700) -> str:
+    if not client:
+        return ""
     try:
         response = await client.chat.completions.create(
             messages=[
@@ -31,9 +33,11 @@ async def complete(system: str, user_message: str, max_tokens: int = 700) -> str
         return response.choices[0].message.content or ""
     except Exception as e:
         logger.error("Groq completion error: %s", e)
-        return '{"reply": "I am experiencing high traffic right now. Let us talk about another movie!", "movie_titles": []}'
+        return ""
 
 async def complete_json(system: str, user_message: str, max_tokens: int = 500) -> dict:
+    if not client:
+        return {"reply": "AI service unconfigured.", "movie_titles": []}
     try:
         response = await client.chat.completions.create(
             messages=[
@@ -51,8 +55,19 @@ async def complete_json(system: str, user_message: str, max_tokens: int = 500) -
         return {"reply": "Sorry, an error occurred while processing data.", "movie_titles": []}
 
 async def chat(system: str, history: list[dict], max_tokens: int = 700) -> str:
-    # Append a strict JSON instruction to the system prompt
-    messages = [{"role": "system", "content": system + "\n\nRespond with ONLY valid JSON."}] + history
+    if not client:
+        return '{"reply": "AI service unavailable.", "movie_titles": []}'
+
+    # Ensure message objects contain strictly 'role' and 'content' for Groq validation
+    sanitized_history = []
+    for msg in history:
+        sanitized_history.append({
+            "role": "user" if msg.get("role") == "user" else "assistant",
+            "content": str(msg.get("content", ""))
+        })
+
+    messages = [{"role": "system", "content": system + "\n\nRespond with ONLY valid JSON."}] + sanitized_history
+
     try:
         response = await client.chat.completions.create(
             messages=messages,
