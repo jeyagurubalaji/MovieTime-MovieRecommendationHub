@@ -49,9 +49,11 @@ export default function MovieDetails() {
       }
 
       setLoading(false)
-      if (isAuthenticated) {
+      if (isAuthenticated && movieData) {
         libraryService.trackRecentlyViewed(movieData, mediaType).catch(() => {})
       }
+    }).catch(() => {
+      setLoading(false)
     })
 
     setAiSummary({ loading: true })
@@ -78,20 +80,25 @@ export default function MovieDetails() {
 
   if (!movie) return null
 
-  const trailers = (movie.videos?.results || []).filter(
-    (v) => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')
+  // Safely extract crew, cast, and videos with optional chaining and array fallbacks
+  const videoResults = movie.videos?.results || []
+  const trailers = videoResults.filter(
+    (v) => v && v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser')
   )
   const officialTrailer = trailers.find((t) => t.type === 'Trailer') || trailers[0]
 
-  const creatorOrDirector = mediaType === 'tv'
-    ? (movie.created_by?.[0] || movie.credits?.crew?.find((c) => c.job === 'Creator'))
-    : movie.credits?.crew?.find((c) => c.job === 'Director')
+  const crewList = movie.credits?.crew || []
+  const castList = movie.credits?.cast || []
 
-  const writers = movie.credits?.crew?.filter((c) => c.department === 'Writing').slice(0, 3) || []
-  const producers = movie.credits?.crew?.filter((c) => c.job === 'Producer').slice(0, 3) || []
+  const creatorOrDirector = mediaType === 'tv'
+    ? (movie.created_by?.[0] || crewList.find((c) => c.job === 'Creator'))
+    : crewList.find((c) => c.job === 'Director')
+
+  const writers = crewList.filter((c) => c.department === 'Writing').slice(0, 3)
+  const producers = crewList.filter((c) => c.job === 'Producer').slice(0, 3)
 
   // Filter out actors that do not have a profile picture
-  const mainCast = (movie.credits?.cast || []).filter(c => c.profile_path)
+  const mainCast = castList.filter((c) => c && c.profile_path)
 
   const displayTitle = movie.title || movie.name
   const displayDate = movie.release_date || movie.first_air_date
@@ -139,7 +146,7 @@ export default function MovieDetails() {
 
             <LibraryActions movie={movie} />
 
-            {providers && providers.flatrate && (
+            {providers && providers.flatrate && providers.flatrate.length > 0 && (
               <div style={{ marginTop: 24 }}>
                 <div className="eyebrow" style={{ marginBottom: 12 }}>Streaming Now</div>
                 <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
