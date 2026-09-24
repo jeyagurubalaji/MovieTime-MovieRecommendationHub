@@ -4,6 +4,7 @@ import { reviewService } from '../services/reviewService'
 import { aiService } from '../services/aiService'
 
 function timeAgo(dateStr) {
+  if (!dateStr) return ''
   const diff = Date.now() - new Date(dateStr).getTime()
   const days = Math.floor(diff / 86400000)
   if (days === 0) return 'today'
@@ -66,34 +67,36 @@ function ReviewItem({ review, onChanged }) {
     onChanged()
   }
 
+  const replies = Array.isArray(review?.replies) ? review.replies : []
+
   return (
     <div className="card" style={{ padding: 18, marginBottom: 14 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
-          <strong style={{ fontSize: 14 }}>{review.userDisplayName}</strong>
-          <span className="eyebrow" style={{ marginLeft: 10 }}>★ {review.rating}/10</span>
+          <strong style={{ fontSize: 14 }}>{review?.userDisplayName || 'Anonymous'}</strong>
+          <span className="eyebrow" style={{ marginLeft: 10 }}>★ {review?.rating || 0}/10</span>
         </div>
-        <span className="muted" style={{ fontSize: 12 }}>{timeAgo(review.createdAt)}</span>
+        <span className="muted" style={{ fontSize: 12 }}>{timeAgo(review?.createdAt)}</span>
       </div>
 
-      {review.spoiler ? (
+      {review?.spoiler ? (
         <details style={{ marginTop: 10 }}>
           <summary style={{ cursor: 'pointer', color: 'var(--gold)', fontSize: 13 }}>
             Contains spoilers — click to reveal
           </summary>
-          <p style={{ marginTop: 8, fontSize: 14, lineHeight: 1.5 }}>{review.text}</p>
+          <p style={{ marginTop: 8, fontSize: 14, lineHeight: 1.5 }}>{review?.text}</p>
         </details>
       ) : (
-        <p style={{ marginTop: 10, fontSize: 14, lineHeight: 1.5 }}>{review.text}</p>
+        <p style={{ marginTop: 10, fontSize: 14, lineHeight: 1.5 }}>{review?.text}</p>
       )}
 
       <div style={{ display: 'flex', gap: 16, marginTop: 12, fontSize: 13 }}>
         <button
           onClick={handleLike}
           className="muted"
-          style={{ background: 'none', border: 'none', color: review.likedByCurrentUser ? 'var(--gold)' : 'var(--text-muted)', padding: 0 }}
+          style={{ background: 'none', border: 'none', color: review?.likedByCurrentUser ? 'var(--gold)' : 'var(--text-muted)', padding: 0 }}
         >
-          👍 {review.likeCount || 0}
+          👍 {review?.likeCount || 0}
         </button>
         {isAuthenticated && (
           <button onClick={() => setReplying((r) => !r)} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', padding: 0 }}>
@@ -105,7 +108,7 @@ function ReviewItem({ review, onChanged }) {
             {reported ? 'Reported' : 'Report'}
           </button>
         )}
-        {user?.id === review.userId && (
+        {user?.id === review?.userId && (
           <button onClick={handleDelete} style={{ background: 'none', border: 'none', color: 'var(--ticket-red)', padding: 0 }}>
             Delete
           </button>
@@ -114,11 +117,11 @@ function ReviewItem({ review, onChanged }) {
 
       {replying && <ReplyForm onSubmit={handleReply} onCancel={() => setReplying(false)} />}
 
-      {review.replies?.length > 0 && (
+      {replies.length > 0 && (
         <div style={{ marginTop: 14, paddingLeft: 16, borderLeft: '2px solid var(--border)' }}>
-          {review.replies.map((r) => (
+          {replies.map((r) => (
             <div key={r.id} style={{ marginBottom: 10 }}>
-              <strong style={{ fontSize: 13 }}>{r.userDisplayName}</strong>{' '}
+              <strong style={{ fontSize: 13 }}>{r.userDisplayName || 'User'}</strong>{' '}
               <span className="muted" style={{ fontSize: 12 }}>{timeAgo(r.createdAt)}</span>
               <p style={{ fontSize: 13, margin: '4px 0 0' }}>{r.text}</p>
             </div>
@@ -144,16 +147,18 @@ export default function ReviewSection({ movieId }) {
     reviewService
       .getForMovie(movieId)
       .then((data) => {
-        setReviews(data)
-        if (data.length > 0) {
+        const reviewList = Array.isArray(data) ? data : []
+        setReviews(reviewList)
+        if (reviewList.length > 0) {
           aiService
-            .spoilerFreeSummary(data.map((r) => ({ rating: r.rating, text: r.text })))
+            .spoilerFreeSummary(reviewList.map((r) => ({ rating: r.rating, text: r.text })))
             .then(setAiSummary)
             .catch(() => setAiSummary(null))
         } else {
           setAiSummary(null)
         }
       })
+      .catch(() => setReviews([]))
       .finally(() => setLoading(false))
   }
 
@@ -176,10 +181,12 @@ export default function ReviewSection({ movieId }) {
     }
   }
 
+  const safeReviews = Array.isArray(reviews) ? reviews : []
+
   return (
     <section style={{ marginTop: 48 }}>
       <div className="section-heading">
-        <h2>Reviews {reviews.length > 0 && <span className="muted" style={{ fontSize: 16 }}>({reviews.length})</span>}</h2>
+        <h2>Reviews {safeReviews.length > 0 && <span className="muted" style={{ fontSize: 16 }}>({safeReviews.length})</span>}</h2>
         {isAuthenticated && (
           <button className="btn btn-outline" onClick={() => setShowForm((s) => !s)}>
             {showForm ? 'Cancel' : 'Write a Review'}
@@ -236,10 +243,10 @@ export default function ReviewSection({ movieId }) {
 
       {loading ? (
         <p className="muted">Loading reviews…</p>
-      ) : reviews.length === 0 ? (
+      ) : safeReviews.length === 0 ? (
         <p className="muted">No reviews yet — be the first to share what you thought.</p>
       ) : (
-        reviews.map((r) => <ReviewItem key={r.id} review={r} onChanged={load} />)
+        safeReviews.map((r) => <ReviewItem key={r.id} review={r} onChanged={load} />)
       )}
     </section>
   )
