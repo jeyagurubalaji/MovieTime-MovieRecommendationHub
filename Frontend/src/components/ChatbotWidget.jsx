@@ -29,11 +29,24 @@ export default function ChatbotWidget() {
     setSending(true)
 
     try {
-      const history = nextMessages.slice(0, -1).map((m) => ({ role: m.role, content: m.content }))
+      const history = nextMessages.slice(0, -1).map((m) => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.content || ''
+      }))
       const data = await aiService.chat(text, history)
-      setMessages((m) => [...m, { role: 'assistant', content: data.reply, suggested_movies: data.suggested_movies || [] }])
-    } catch {
-      setMessages((m) => [...m, { role: 'assistant', content: "Sorry, I couldn't connect just now. Try again in a moment.", suggested_movies: [] }])
+      setMessages((m) => [
+        ...m,
+        {
+          role: 'assistant',
+          content: data?.reply || "Here are a few options you might enjoy:",
+          suggested_movies: Array.isArray(data?.suggested_movies) ? data.suggested_movies : []
+        }
+      ])
+    } catch (err) {
+      setMessages((m) => [
+        ...m,
+        { role: 'assistant', content: "Sorry, I couldn't connect just now. Try again in a moment.", suggested_movies: [] }
+      ])
     } finally {
       setSending(false)
     }
@@ -83,7 +96,7 @@ export default function ChatbotWidget() {
                   {m.content}
                 </div>
 
-                {m.suggested_movies?.length > 0 && (
+                {Array.isArray(m.suggested_movies) && m.suggested_movies.length > 0 && (
                   <div style={{ display: 'flex', gap: 8, overflowX: 'auto', marginTop: 8, maxWidth: '100%' }}>
                     {m.suggested_movies.map((movie) => (
                       <Link key={movie.id} to={`/movie/${movie.id}`} onClick={() => setOpen(false)} style={{ flexShrink: 0, width: 72 }}>
