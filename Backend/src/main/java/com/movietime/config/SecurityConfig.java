@@ -33,6 +33,9 @@ public class SecurityConfig {
     private String allowedOrigins;
 
     private static final String[] PUBLIC_ENDPOINTS = {
+            // Health check endpoint
+            "/health",
+
             // Swagger / OpenAPI documentation
             "/v3/api-docs/**",
             "/swagger-ui/**",
@@ -75,7 +78,6 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Parse and trim origins to avoid leading/trailing spaces breaking browser preflights
         List<String> origins = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .filter(origin -> !origin.isEmpty())
