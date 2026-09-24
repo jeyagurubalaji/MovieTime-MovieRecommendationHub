@@ -51,9 +51,7 @@ async def tmdb_network_error_handler(request: Request, exc: httpx.RequestError):
 async def health():
     return {
         "status": "UP",
-        "service": "MovieTime-AI-Service",
-        "ai_enabled": settings.ai_enabled,
-        "tmdb_configured": settings.tmdb_api_key != "my-tmdb-api-key",
+        "service": "MovieTime-AI-Service"
     }
 
 
