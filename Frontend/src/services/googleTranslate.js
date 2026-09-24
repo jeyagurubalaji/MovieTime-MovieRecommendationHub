@@ -2,7 +2,10 @@ import { SOURCE_LANGUAGE } from '../data/languages'
 
 const CACHE_PREFIX = 'gt_cache::'
 const CONCURRENCY = 4
-const BACKEND_TRANSLATE_URL = 'http://localhost:8000/ai/translate'
+
+// Read from Vite environment variable with local fallback
+const AI_SERVICE_BASE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8000'
+const BACKEND_TRANSLATE_URL = `${AI_SERVICE_BASE_URL}/ai/translate`
 
 const memoryCache = new Map()
 
@@ -26,7 +29,7 @@ function persistLangCache(targetLang, cache) {
 
 async function translateOne(text, targetLang, sourceLang = 'auto') {
   try {
-    const response = await fetch('http://localhost:8000/ai/translate', {
+    const response = await fetch(BACKEND_TRANSLATE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -41,11 +44,10 @@ async function translateOne(text, targetLang, sourceLang = 'auto') {
     if (!response.ok) throw new Error('Translation backend failed');
 
     const data = await response.json();
-    // Maps to the "translation" key returned by your FastAPI endpoint
     return data.translation || text;
   } catch (err) {
     console.warn('[Translation API Error]:', err);
-    return text; // Fallback to English UI on failure
+    return text;
   }
 }
 
