@@ -1,19 +1,18 @@
+import json
 import logging
+import re
 
 from app.services import llm_client
 from app.services.tmdb_client import tmdb_client
 
 logger = logging.getLogger(__name__)
 
-CHAT_SYSTEM_PROMPT = """You are the MovieTime AI assistant - warm, concise, genuinely knowledgeable about \
-film. You help people decide what to watch, answer questions about movies, and hold a natural conversation.
+CHAT_SYSTEM_PROMPT = """You are the MovieTime AI assistant - warm, concise, genuinely knowledgeable about film. You help people decide what to watch, answer questions about movies, and hold a natural conversation.
 
 When you want to recommend specific movies, respond with JSON only, no other text:
 {"reply": "<your conversational reply, 2-4 sentences>", "movie_titles": ["Exact Title", "Exact Title 2"]}
 
-"movie_titles" should contain 0-5 REAL movie titles (exact, correctly spelled) that support your reply. \
-Use an empty array if you're just chatting, answering a factual question, or asking a clarifying question \
-rather than recommending something to watch."""
+"movie_titles" should contain 0-5 REAL movie titles (exact, correctly spelled) that support your reply. Use an empty array if you're just chatting, answering a factual question, or asking a clarifying question rather than recommending something to watch."""
 
 FALLBACK_REPLY = (
     "I'm not fully wired up to an AI model right now (no API key configured), but I can still help you "
@@ -24,6 +23,8 @@ FALLBACK_REPLY = (
 async def _resolve_titles(titles: list[str]) -> list[dict]:
     resolved = []
     for title in titles[:5]:
+        if not title or not isinstance(title, str):
+            continue
         try:
             data = await tmdb_client.search_movies(title, page=1)
             results = data.get("results", [])
@@ -49,19 +50,26 @@ async def chat(message: str, history: list[dict]) -> dict:
     try:
         conversation = history + [{"role": "user", "content": message}]
         raw = await llm_client.chat(CHAT_SYSTEM_PROMPT, conversation)
-        cleaned = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
 
-        import json
+        cleaned = raw.strip()
+        # Remove markdown codeblocks if model wraps output
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+
         parsed = json.loads(cleaned)
-        reply = parsed.get("reply", raw)
+        reply = parsed.get("reply", "Here are a few recommendations:")
         titles = parsed.get("movie_titles", [])
+
+        if not isinstance(titles, list):
+            titles = []
+
         suggested = await _resolve_titles(titles) if titles else []
 
         return {"reply": reply, "suggested_movies": suggested, "ai_powered": True}
     except Exception as e:
         logger.warning("Chat completion/parsing failed: %s", e)
         return {
-            "reply": "Sorry, I had trouble processing that. Could you rephrase?",
+            "reply": "Sorry, I had trouble processing that. Could you rephrase or ask about another movie?",
             "suggested_movies": [],
             "ai_powered": True,
         }
