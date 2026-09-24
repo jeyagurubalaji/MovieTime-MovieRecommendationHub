@@ -47,7 +47,7 @@ async def tmdb_network_error_handler(request: Request, exc: httpx.RequestError):
     return JSONResponse(status_code=502, content={"detail": "Could not reach TMDB. Check network/API connectivity."})
 
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {
         "status": "UP",
