@@ -17,18 +17,29 @@ export default function Mood() {
   const [selected, setSelected] = useState(null)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   const pick = async (mood) => {
     setSelected(mood)
     setLoading(true)
     setResult(null)
+    setError(null)
     try {
       const data = await aiService.mood(mood)
-      setResult(data)
+      if (data && Array.isArray(data.results)) {
+        setResult(data)
+      } else {
+        setResult({ results: [] })
+      }
+    } catch (err) {
+      setError('Unable to load picks for this mood. Please try again.')
+      setResult({ results: [] })
     } finally {
       setLoading(false)
     }
   }
+
+  const moviesList = Array.isArray(result?.results) ? result.results : []
 
   return (
     <div className="page">
@@ -53,16 +64,27 @@ export default function Mood() {
         </div>
 
         {loading && <p className="muted">Finding picks for that mood…</p>}
+        {error && <p style={{ color: 'var(--ticket-red)', fontSize: 14 }}>{error}</p>}
 
-                {result && (
-                  <>
-                    {/* The message box div has been completely removed from here */}
-                    <div className="movie-row">
-                      {result.results.map((m) => <MovieCard key={m.id} movie={m} />)}
-                    </div>
-                  </>
-                )}
+        {result && !loading && (
+          <>
+            {result.message && (
+              <p style={{ fontSize: 16, marginBottom: 20, color: 'var(--gold)' }}>
+                {result.message}
+              </p>
+            )}
+            {moviesList.length > 0 ? (
+              <div className="movie-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 20 }}>
+                {moviesList.map((m) => (
+                  <MovieCard key={m.id} movie={m} />
+                ))}
               </div>
-            </div>
-          )
-        }
+            ) : (
+              <p className="muted">No titles found for this mood.</p>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
