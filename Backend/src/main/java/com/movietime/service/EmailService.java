@@ -2,7 +2,6 @@ package com.movietime.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -14,30 +13,25 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
-
-    public void sendPasswordResetEmail(String toEmail, String resetToken) {
-        String resetLink = frontendUrl + "/reset-password?token=" + resetToken;
-
+    public void sendPasswordResetOtp(String toEmail, String otp) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(toEmail);
-            message.setSubject("Reset your MovieTime password");
+            message.setSubject("MovieTime - Password Reset Verification Code");
             message.setText("""
-                    We received a request to reset your MovieTime password.
+                    Your password reset verification code is:
 
-                    Reset it here (link expires in 1 hour):
                     %s
 
-                    If you didn't request this, you can safely ignore this email.
+                    This OTP is valid for 10 minutes. Do not share this code with anyone.
+
+                    If you didn't request a password reset, please ignore this email.
 
                     - The MovieTime Team
-                    """.formatted(resetLink));
+                    """.formatted(otp));
             mailSender.send(message);
         } catch (Exception e) {
-            // Don't let a mail-server misconfiguration break the forgot-password flow in dev.
-            log.warn("Failed to send password reset email to {}: {}", toEmail, e.getMessage());
+            log.warn("Failed to send OTP email to {}: {}", toEmail, e.getMessage());
         }
     }
 }
