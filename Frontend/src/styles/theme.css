@@ -629,4 +629,16 @@ html[data-font-scale="x-large"] { font-size: 20px; }
   border: 0;
 }
 
+.field button:hover {
+  color: var(--gold) !important;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
 /* ---------- Translation status pill (see TranslationStatus.jsx) uses inline styles, no CSS needed here ---------- */
