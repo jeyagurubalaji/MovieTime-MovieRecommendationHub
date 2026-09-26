@@ -54,19 +54,49 @@ export default function ChatbotWidget() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-label={open ? 'Close chat assistant' : 'Open chat assistant'}
-        style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 60,
-          width: 56, height: 56, borderRadius: '50%', border: 'none',
-          background: 'var(--gold)', color: '#14161F', fontSize: 24,
-          boxShadow: '0 8px 24px rgba(0,0,0,0.4)', cursor: 'pointer',
-        }}
-      >
-        {open ? '✕' : '🎬'}
-      </button>
+      {/* Container to position the popup banner directly above the button */}
+      <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 60, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
 
+        {/* Pop-up Banner displayed whenever chat is closed */}
+        {!open && (
+          <div
+            onClick={() => setOpen(true)}
+            style={{
+              background: 'var(--surface-raised)',
+              border: '1px solid var(--gold)',
+              color: 'var(--text)',
+              padding: '8px 14px',
+              borderRadius: '12px',
+              fontSize: '13px',
+              fontWeight: '600',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap',
+              animation: 'bounce 2s infinite'
+            }}
+          >
+            🤖 Need movie recommendations? Ask AI!
+          </div>
+        )}
+
+        {/* Floating AI Button */}
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-label={open ? 'Close chat assistant' : 'Open chat assistant'}
+          style={{
+            width: 56, height: 56, borderRadius: '50%', border: 'none',
+            background: 'var(--gold)', color: '#14161F', fontSize: 24,
+            boxShadow: '0 8px 24px rgba(0,0,0,0.4)', cursor: 'pointer',
+          }}
+        >
+          {open ? '✕' : '🎬'}
+        </button>
+      </div>
+
+      {/* Chat Drawer */}
       {open && (
         <div
           className="card"
