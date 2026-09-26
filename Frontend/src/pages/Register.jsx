@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx'
 import LanguageSwitcher from '../components/LanguageSwitcher.jsx'
+import PasswordInput from '../components/PasswordInput'
 
 export default function Register() {
   const { register } = useAuth()
@@ -79,10 +80,9 @@ export default function Register() {
           </div>
           <div className="field">
             <label htmlFor="password">Password</label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               minLength={8}
               placeholder="Enter the password"
