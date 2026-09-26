@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { authService } from '../services/authService'
+import PasswordInput from '../components/PasswordInput'
 
 export default function ResetPassword() {
-  const [searchParams] = useSearchParams()
-  const token = searchParams.get('token') || ''
+  const location = useLocation()
   const navigate = useNavigate()
 
+  const [email, setEmail] = useState(location.state?.email || '')
+  const [otp, setOtp] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -17,49 +19,75 @@ export default function ResetPassword() {
     setError('')
     setSubmitting(true)
     try {
-      await authService.resetPassword(token, password)
+      await authService.resetPassword(email, otp, password)
       setDone(true)
       setTimeout(() => navigate('/login'), 2000)
     } catch (err) {
-      setError(err.response?.data?.message || 'Unable to reset password. The link may have expired.')
+      setError(err.response?.data?.message || 'Unable to reset password. Check your OTP and try again.')
     } finally {
       setSubmitting(false)
     }
   }
 
-  if (!token) {
-    return (
-      <div className="auth-page">
-        <div className="card auth-card">
-          <h1 className="display">Invalid Link</h1>
-          <p className="auth-subtitle">This password reset link is missing its token.</p>
-          <Link to="/forgot-password" className="btn btn-primary">Request a new link</Link>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="auth-page">
       <div className="card auth-card">
-        <h1 className="display">Set New Password</h1>
-        <p className="auth-subtitle">Choose a new password for your account.</p>
+        <h1 className="display">Verify OTP</h1>
+        <p className="auth-subtitle">Enter the 6-digit code sent to your email and set your new password.</p>
 
         {error && <div className="form-error-banner">{error}</div>}
 
         {done ? (
-          <p style={{ color: 'var(--success)', fontSize: 14 }}>Password updated. Redirecting to sign in…</p>
+          <p style={{ color: 'var(--success)', fontSize: 14 }}>Password reset successfully! Redirecting to sign in…</p>
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="field">
-              <label htmlFor="password">New password</label>
-              <input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                required
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
+
+            <div className="field">
+              <label htmlFor="otp">6-Digit OTP</label>
+              <input
+                id="otp"
+                type="text"
+                required
+                maxLength={6}
+                placeholder="123456"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                style={{ letterSpacing: '0.2em', textAlign: 'center', fontSize: '16px', fontWeight: 'bold' }}
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="password">New Password</label>
+              <PasswordInput
+                id="password"
+                required
+                minLength={8}
+                placeholder="Enter new password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+
             <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
-              {submitting ? 'Updating…' : 'Update Password'}
+              {submitting ? 'Updating…' : 'Reset Password'}
             </button>
           </form>
         )}
+
+        <p className="auth-footer-link">
+          <Link to="/forgot-password">Resend Code</Link>
+        </p>
       </div>
     </div>
   )
