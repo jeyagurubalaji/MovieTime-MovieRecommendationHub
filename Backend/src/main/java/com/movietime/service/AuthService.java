@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.Instant;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -92,7 +92,6 @@ public class AuthService {
                         .createdAt(Instant.now())
                         .build());
 
-        // Link Google to an existing local account on first Google sign-in
         if (user.getGoogleId() == null) {
             user.setGoogleId(googleId);
             if (user.getProfilePictureUrl() == null) {
@@ -113,22 +112,25 @@ public class AuthService {
 
     public void forgotPassword(ForgotPasswordRequest request) {
         userRepository.findByEmail(request.getEmail().toLowerCase().trim()).ifPresent(user -> {
-            String resetToken = UUID.randomUUID().toString();
-            user.setPasswordResetToken(resetToken);
-            user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(3600)); // 1 hour
+            String otp = String.format("%06d", new SecureRandom().nextInt(1000000));
+            user.setPasswordResetToken(otp);
+            user.setPasswordResetTokenExpiry(Instant.now().plusSeconds(600)); // 10 minutes
             userRepository.save(user);
-            emailService.sendPasswordResetEmail(user.getEmail(), resetToken);
+            emailService.sendPasswordResetOtp(user.getEmail(), otp);
         });
-        // Always respond as success to avoid leaking which emails are registered
     }
 
     public void resetPassword(ResetPasswordRequest request) {
-        User user = userRepository.findByPasswordResetToken(request.getToken())
-                .orElseThrow(() -> new ApiException("Invalid or expired reset token", HttpStatus.BAD_REQUEST));
+        User user = userRepository.findByEmail(request.getEmail().toLowerCase().trim())
+                .orElseThrow(() -> new ApiException("Invalid email or code", HttpStatus.BAD_REQUEST));
+
+        if (user.getPasswordResetToken() == null || !user.getPasswordResetToken().equals(request.getOtp().trim())) {
+            throw new ApiException("Invalid verification code (OTP)", HttpStatus.BAD_REQUEST);
+        }
 
         if (user.getPasswordResetTokenExpiry() == null
                 || user.getPasswordResetTokenExpiry().isBefore(Instant.now())) {
-            throw new ApiException("Reset token has expired. Please request a new one.", HttpStatus.BAD_REQUEST);
+            throw new ApiException("Verification code has expired. Please request a new one.", HttpStatus.BAD_REQUEST);
         }
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
