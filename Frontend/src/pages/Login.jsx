@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import GoogleSignInButton from '../components/GoogleSignInButton.jsx'
 import LanguageSwitcher from '../components/LanguageSwitcher.jsx'
+import PasswordInput from '../components/PasswordInput.jsx'
 
 export default function Login() {
   const { login } = useAuth()
@@ -67,10 +68,9 @@ export default function Login() {
           </div>
           <div className="field">
             <label htmlFor="password">Password</label>
-            <input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               required
               placeholder="Enter the password"
               value={form.password}
