@@ -6,7 +6,6 @@ from app.services.tmdb_client import tmdb_client
 
 logger = logging.getLogger(__name__)
 
-# CHANGED: Instruct the AI to detect 'media_type', alongside the exact year, language, and actor filters.
 SYSTEM_PROMPT = """You are a movie and TV search assistant for MovieTime. Given a free-text description of \
 what someone wants to watch, extract structured search filters.
 
@@ -15,7 +14,7 @@ Return JSON with these fields:
 - "genres": array of genre names from this exact list (lowercase): action, adventure, animation, comedy, \
 crime, documentary, drama, family, fantasy, history, horror, music, mystery, romance, science fiction, \
 thriller, war, western. Include only genres clearly implied. Can be empty.
-- "keywords": a short (2-4 word) plain-language search phrase capturing the core concept. Empty string if none.
+- "keywords": a short (2-4 word) plain-language search phrase capturing the specific person, title, or subject (e.g. "barack obama", "michael jackson", "batman"). Empty string if none.
 - "year": exact 4-digit release year if mentioned, else null.
 - "language": 2-letter ISO 639-1 language code if a specific language/region is mentioned (e.g. 'ta' for Tamil), else null.
 - "actor": full name of an actor or director if mentioned, else null.
@@ -29,11 +28,11 @@ def _rule_based_fallback(description: str) -> dict:
     return {
         "media_type": "tv" if is_tv else "movie",
         "genres": matched_genres[:3],
-        "keywords": "",
+        "keywords": description.strip(),
         "year": None,
         "language": None,
         "actor": None,
-        "explanation": "Searching by the genres and terms mentioned in your description.",
+        "explanation": "Searching by the terms mentioned in your description.",
     }
 
 
@@ -55,58 +54,34 @@ async def search_by_description(description: str, page: int = 1) -> dict:
     if media_type not in ["movie", "tv"]:
         media_type = "movie"
 
-    # 2. Build strict discovery parameters
-    discover_params: dict = {"page": page, "sort_by": "popularity.desc"}
+    # 2. Extract potential text search query
+    keyword_text = filters.get("keywords") or ""
+    actor_name = filters.get("actor") or ""
 
-    genre_ids = [str(GENRE_IDS[g]) for g in filters.get("genres", []) if g in GENRE_IDS]
-    if genre_ids:
-        discover_params["with_genres"] = ",".join(genre_ids)
-
-    if filters.get("year"):
-        if media_type == "tv":
-            discover_params["first_air_date_year"] = filters["year"]
-        else:
-            discover_params["primary_release_year"] = filters["year"]
-
-    if filters.get("language"):
-        discover_params["with_original_language"] = filters["language"]
-
-    actor_name = filters.get("actor")
-    if actor_name:
-        try:
-            person_search = await tmdb_client._get("/search/person", {"query": actor_name})
-            if person_search and person_search.get("results"):
-                discover_params["with_cast"] = person_search["results"][0]["id"]
-        except Exception as e:
-            logger.warning(f"Failed to resolve actor {actor_name}: {e}")
+    primary_query = keyword_text or actor_name or description.strip()
 
     results: list[dict] = []
-    has_strict_filters = bool(actor_name or filters.get("year") or filters.get("language") or genre_ids)
 
-    # 3. Route to the correct TMDB endpoint based on media_type
-    if has_strict_filters:
+    # 3. Direct text search only — NO generic discover fallback
+    if primary_query:
         try:
-            data = await tmdb_client.discover(media_type=media_type, **discover_params)
-            results = data.get("results", [])
+            search_data = await tmdb_client.search_movies(primary_query, page, media_type=media_type)
+            results = search_data.get("results", [])
         except Exception as e:
-            logger.warning(f"Discover API failed: {e}")
+            logger.warning(f"Text search failed for '{primary_query}': {e}")
 
-    keyword_text = filters.get("keywords") or ""
-    if not results and keyword_text:
+    # Check alternate media type if initial media_type yielded no results
+    if not results and primary_query:
+        alt_type = "tv" if media_type == "movie" else "movie"
         try:
-            search_data = await tmdb_client.search_movies(keyword_text, page, media_type=media_type)
+            search_data = await tmdb_client.search_movies(primary_query, page, media_type=alt_type)
             results = search_data.get("results", [])
+            if results:
+                media_type = alt_type
         except Exception:
             pass
 
-    if not results:
-        try:
-            search_data = await tmdb_client.search_movies(description, page, media_type=media_type)
-            results = search_data.get("results", [])
-        except Exception:
-            pass
-
-    # 4. Map TV and Movie fields uniformly so React cards don't break
+    # 4. Map TV and Movie fields uniformly
     summaries = []
     for m in results:
         ret_type = m.get("media_type") or media_type
