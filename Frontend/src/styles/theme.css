@@ -403,6 +403,7 @@ button {
   font-size: 26px;
   letter-spacing: 0.06em;
   color: var(--text);
+  white-space: nowrap;
 }
 
 .navbar-logo span {
@@ -440,12 +441,16 @@ button {
   color: var(--gold);
 }
 
-/* ---------- Responsive Navbar Menu ---------- */
-@media (max-width: 900px) {
-  .desktop-only {
+/* ---------- Responsive Navigation Drawer ---------- */
+.mobile-menu-btn {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .desktop-links {
     display: none !important;
   }
-  .mobile-menu-toggle {
+  .mobile-menu-btn {
     display: inline-flex !important;
   }
 }
@@ -454,13 +459,16 @@ button {
   background: var(--surface);
   border-top: 1px solid var(--border);
   padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .mobile-nav-drawer a {
-  padding: 8px 0;
   font-size: 15px;
   font-weight: 500;
   color: var(--text-muted);
+  padding: 6px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -565,26 +573,28 @@ button {
   font-weight: 600;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero & Responsive Layout Rules ---------- */
 .hero {
-  padding: 48px 0 24px;
+  padding: 0;
 }
 
-.hero-content {
+.hero-body {
   padding: 48px 40px;
   position: relative;
 }
 
 .hero-title {
-  font-size: clamp(36px, 7vw, 84px);
+  font-size: clamp(32px, 6vw, 76px);
   margin: 12px 0 16px;
+  line-height: 1.05;
 }
 
 .hero-subtitle {
   color: var(--text-muted);
-  font-size: 17px;
+  font-size: 16px;
   max-width: 560px;
   margin-bottom: 28px;
+  line-height: 1.5;
 }
 
 .hero-bulbs {
@@ -601,52 +611,47 @@ button {
   box-shadow: 0 0 8px var(--gold);
 }
 
-.hero-actions {
+.hero-actions-group {
   display: flex;
   gap: 12px;
+  align-items: center;
   flex-wrap: wrap;
 }
 
-@media (max-width: 640px) {
-  .hero-content {
-    padding: 24px 16px;
+@media (max-width: 768px) {
+  .hero-body {
+    padding: 24px 20px;
   }
-  .hero-actions {
+  .hero-actions-group {
     flex-direction: column;
     width: 100%;
+    align-items: stretch;
   }
-  .hero-actions .btn,
-  .hero-actions button,
-  .hero-actions a {
+  .hero-actions-group .btn,
+  .hero-actions-group button,
+  .hero-actions-group a {
     width: 100%;
     text-align: center;
-    box-sizing: border-box;
   }
 }
 
-/* ---------- Daily Pick Card Responsive Layout ---------- */
-.daily-pick-inner {
+/* ---------- Daily Pick Responsive Cards ---------- */
+.daily-pick-wrapper {
   display: flex;
   gap: 20px;
   padding: 20px;
   align-items: center;
 }
 
-.daily-pick-img {
-  width: 90px;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-@media (max-width: 480px) {
-  .daily-pick-inner {
+@media (max-width: 520px) {
+  .daily-pick-wrapper {
     flex-direction: column;
     align-items: flex-start;
-    gap: 12px;
+    padding: 16px;
   }
-  .daily-pick-img {
-    width: 100%;
-    max-height: 220px;
+  .daily-pick-wrapper img {
+    width: 100% !important;
+    max-height: 240px;
     object-fit: cover;
   }
 }
