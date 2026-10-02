@@ -37,7 +37,7 @@ export default function Navbar() {
           <LanguageSwitcher />
 
           <button
-            className="icon-btn"
+            className="icon-btn theme-toggle-btn"
             onClick={toggleTheme}
             aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
@@ -67,7 +67,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation (3-Bar Menu) */}
+      {/* Mobile Drawer Navigation */}
       {isOpen && (
         <nav className="mobile-nav-drawer mobile-only" aria-label="Mobile navigation">
           <Link to="/" onClick={closeMenu}>Home</Link>
