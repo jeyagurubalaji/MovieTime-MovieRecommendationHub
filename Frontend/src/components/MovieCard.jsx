@@ -23,30 +23,54 @@ export default function MovieCard({ movie }) {
 
   const imageSrc = posterUrl(imagePath)
 
+  const cardContent = (
+    <div style={{ position: 'relative', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
+      {rating && <span className="movie-rating" style={{ zIndex: 2 }}>★ {rating}</span>}
+      <img
+        src={imageSrc}
+        alt={displayTitle}
+        loading="lazy"
+        style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+      />
+      {/* Dark overlay for text readability */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.45)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '12px',
+          textAlign: 'center'
+        }}
+      >
+        <span
+          style={{
+            color: '#FFFFFF',
+            fontWeight: '700',
+            fontSize: '0.95rem',
+            lineHeight: '1.25',
+            textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+          }}
+        >
+          {displayTitle}
+        </span>
+      </div>
+    </div>
+  )
+
   if (mediaType === 'person') {
     return (
-      <div className="movie-card" style={{ cursor: 'default', width: '100%', position: 'relative' }}>
-        <img
-          src={imageSrc}
-          alt={displayTitle}
-          loading="lazy"
-          style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block', borderRadius: '8px' }}
-        />
-        <div className="movie-card-title" style={{ padding: '6px 0', fontSize: '0.875rem' }}>{displayTitle}</div>
+      <div className="movie-card" style={{ cursor: 'default', width: '100%' }}>
+        {cardContent}
       </div>
     )
   }
 
   return (
-    <Link to={`/movie/${movie.id}?type=${mediaType}`} className="movie-card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', width: '100%', position: 'relative' }}>
-      {rating && <span className="movie-rating">★ {rating}</span>}
-      <img
-        src={imageSrc}
-        alt={displayTitle}
-        loading="lazy"
-        style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block', borderRadius: '8px' }}
-      />
-      <div className="movie-card-title" style={{ padding: '6px 0', fontSize: '0.875rem' }}>{displayTitle}</div>
+    <Link to={`/movie/${movie.id}?type=${mediaType}`} className="movie-card" style={{ display: 'block', width: '100%' }}>
+      {cardContent}
     </Link>
   )
 }
