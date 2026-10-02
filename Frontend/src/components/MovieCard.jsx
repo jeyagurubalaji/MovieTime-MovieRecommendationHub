@@ -19,34 +19,34 @@ export default function MovieCard({ movie }) {
   const imagePath = movie.poster_path || movie.profile_path
 
   // STRICT FILTER: If there is no image from TMDB, hide this card entirely.
-  if (!imagePath) return null;
+  if (!imagePath) return null
 
   const imageSrc = posterUrl(imagePath)
 
   if (mediaType === 'person') {
     return (
-      <div className="movie-card" style={{ cursor: 'default' }}>
+      <div className="movie-card" style={{ cursor: 'default', width: '100%', position: 'relative' }}>
         <img
           src={imageSrc}
           alt={displayTitle}
           loading="lazy"
-          style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block', borderRadius: '8px' }}
         />
-        <div className="movie-card-title">{displayTitle}</div>
+        <div className="movie-card-title" style={{ padding: '6px 0', fontSize: '0.875rem' }}>{displayTitle}</div>
       </div>
     )
   }
 
   return (
-    <Link to={`/movie/${movie.id}?type=${mediaType}`} className="movie-card">
+    <Link to={`/movie/${movie.id}?type=${mediaType}`} className="movie-card" style={{ display: 'block', textDecoration: 'none', color: 'inherit', width: '100%', position: 'relative' }}>
       {rating && <span className="movie-rating">★ {rating}</span>}
       <img
         src={imageSrc}
         alt={displayTitle}
         loading="lazy"
-        style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
+        style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block', borderRadius: '8px' }}
       />
-      <div className="movie-card-title">{displayTitle}</div>
+      <div className="movie-card-title" style={{ padding: '6px 0', fontSize: '0.875rem' }}>{displayTitle}</div>
     </Link>
   )
 }
