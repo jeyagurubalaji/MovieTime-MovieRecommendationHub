@@ -22,15 +22,15 @@ function DailyPick() {
   if (!movie) return null
 
   return (
-    <Link to={`/movie/${movie.id}`} className="marquee-frame" style={{ display: 'block', marginTop: 24, textDecoration: 'none', color: 'inherit' }}>
-      <div style={{ display: 'flex', gap: 20, padding: 20, alignItems: 'center' }}>
+    <Link to={`/movie/${movie.id}`} className="marquee-frame daily-pick-card" style={{ display: 'block', marginTop: 24, textDecoration: 'none', color: 'inherit' }}>
+      <div className="daily-pick-inner">
         {movie.poster_path && (
-          <img src={posterUrl(movie.poster_path, 'w185')} alt={movie.title} style={{ width: 90, borderRadius: 8, flexShrink: 0 }} />
+          <img src={posterUrl(movie.poster_path, 'w185')} alt={movie.title} className="daily-pick-img" />
         )}
         <div>
           <span className="eyebrow">🎯 Today's Pick</span>
-          <h3 style={{ margin: '6px 0 4px', fontSize: 18 }}>{movie.title}</h3>
-          <p className="muted" style={{ fontSize: 13, margin: 0 }}>
+          <h3 style={{ margin: '6px 0 4px', fontSize: '1.125rem' }}>{movie.title}</h3>
+          <p className="muted" style={{ fontSize: '0.85rem', margin: 0 }}>
             {movie.overview?.length > 140 ? movie.overview.slice(0, 140) + '…' : movie.overview}
           </p>
         </div>
@@ -54,7 +54,7 @@ function RandomPickerButton() {
   }
 
   return (
-    <button className="btn btn-outline" onClick={handleClick} disabled={loading}>
+    <button className="btn btn-outline" onClick={handleClick} disabled={loading} style={{ width: '100%' }}>
       {loading ? 'Picking…' : '🎲 Surprise Me'}
     </button>
   )
@@ -78,10 +78,10 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="page">
-      <div className="container">
+    <div className="page" style={{ overflowX: 'hidden' }}>
+      <div className="container" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '0 1rem' }}>
         <div className="hero marquee-frame">
-          <div style={{ padding: '48px 40px', position: 'relative' }}>
+          <div className="hero-content">
             <div className="hero-bulbs">
               {Array.from({ length: 10 }).map((_, i) => (
                 <span key={i} className="hero-bulb" />
@@ -93,9 +93,9 @@ export default function Home() {
               Trending picks, smart search, and an AI assistant that actually gets your mood —
               all under one marquee.
             </p>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <a href="/search" className="btn btn-primary">Start Searching</a>
-              <a href="/categories" className="btn btn-outline">Browse Categories</a>
+            <div className="hero-actions">
+              <Link to="/search" className="btn btn-primary">Start Searching</Link>
+              <Link to="/categories" className="btn btn-outline">Browse Categories</Link>
               <RandomPickerButton />
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function Home() {
 
         <DailyPick />
 
-        <div className="film-strip-divider" style={{ margin: '40px 0' }} />
+        <div className="film-strip-divider" style={{ margin: '30px 0' }} />
 
         {LISTS.map(({ key, title }) => (
           <MovieRow
