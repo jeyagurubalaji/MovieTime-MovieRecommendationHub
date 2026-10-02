@@ -7,7 +7,7 @@ import UserProfileMenu from './UserProfileMenu.jsx'
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
-  const { user, isAuthenticated } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
 
   const closeMenu = () => setIsOpen(false)
@@ -19,8 +19,8 @@ export default function Navbar() {
           Movie<span>Time</span>
         </Link>
 
-        {/* Desktop Links */}
-        <nav className="navbar-links desktop-links" aria-label="Main navigation">
+        {/* Laptop Navigation Links */}
+        <nav className="navbar-links desktop-only" aria-label="Main navigation">
           <Link to="/">Home</Link>
           <Link to="/search">Search</Link>
           <Link to="/categories">Categories</Link>
@@ -32,8 +32,8 @@ export default function Navbar() {
           {isAuthenticated && <Link to="/library">My Library</Link>}
         </nav>
 
-        {/* Actions Section */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* Laptop Right Control Actions */}
+        <div className="navbar-actions desktop-only">
           <LanguageSwitcher />
 
           <button
@@ -52,8 +52,11 @@ export default function Navbar() {
               Sign In
             </Link>
           )}
+        </div>
 
-          {/* Hamburger Menu Icon for Mobile/Tablet */}
+        {/* Mobile Navbar Header Bar */}
+        <div className="mobile-header-actions mobile-only">
+          <LanguageSwitcher />
           <button
             className="icon-btn mobile-menu-btn"
             onClick={() => setIsOpen(!isOpen)}
@@ -64,9 +67,9 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation Links */}
+      {/* Mobile Drawer Navigation (3-Bar Menu) */}
       {isOpen && (
-        <nav className="mobile-nav-drawer" aria-label="Mobile navigation">
+        <nav className="mobile-nav-drawer mobile-only" aria-label="Mobile navigation">
           <Link to="/" onClick={closeMenu}>Home</Link>
           <Link to="/search" onClick={closeMenu}>Search</Link>
           <Link to="/categories" onClick={closeMenu}>Categories</Link>
@@ -76,6 +79,31 @@ export default function Navbar() {
           {isAuthenticated && <Link to="/games" onClick={closeMenu}>Games</Link>}
           <Link to="/leaderboard" onClick={closeMenu}>Leaderboard</Link>
           {isAuthenticated && <Link to="/library" onClick={closeMenu}>My Library</Link>}
+
+          <div className="mobile-drawer-footer">
+            <button
+              className="btn btn-outline mobile-theme-btn"
+              onClick={toggleTheme}
+            >
+              {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+            </button>
+
+            {isAuthenticated ? (
+              <button
+                className="btn btn-primary mobile-logout-btn"
+                onClick={() => {
+                  logout?.()
+                  closeMenu()
+                }}
+              >
+                Log Out
+              </button>
+            ) : (
+              <Link to="/login" className="btn btn-primary" onClick={closeMenu}>
+                Sign In
+              </Link>
+            )}
+          </div>
         </nav>
       )}
     </header>
