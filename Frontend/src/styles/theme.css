@@ -725,3 +725,64 @@ html[data-font-scale="x-large"] { font-size: 20px; }
     transform: translateY(-5px);
   }
 }
+
+/* ---------- Device Visibility Control ---------- */
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  display: flex !important;
+}
+
+@media (max-width: 900px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: flex !important;
+  }
+
+  .mobile-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-nav-drawer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+  }
+
+  .mobile-drawer-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .mobile-theme-btn,
+  .mobile-logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Floating AI Widget Mobile Alignment Fix */
+  .ai-assistant-floating-btn,
+  .ai-widget-trigger,
+  [class*="ai-widget"],
+  [class*="assistant-btn"] {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 16px !important;
+    left: auto !important;
+    transform: none !important;
+    z-index: 999 !important;
+  }
+}
