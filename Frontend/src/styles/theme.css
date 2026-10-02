@@ -441,6 +441,18 @@ button {
   color: var(--gold);
 }
 
+/* ---------- Navbar Actions & Spacing ---------- */
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* Proper space between Language, Theme Toggle, and Profile */
+}
+
+.theme-toggle-btn {
+  margin: 0 4px; /* Extra breathing space around the theme toggle */
+  flex-shrink: 0;
+}
+
 /* ---------- Responsive Navigation Drawer ---------- */
 .mobile-menu-btn {
   display: none;
