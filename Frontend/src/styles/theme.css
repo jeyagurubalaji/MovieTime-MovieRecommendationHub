@@ -112,6 +112,7 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   transition: background var(--transition), color var(--transition);
+  overflow-x: hidden;
 }
 
 a {
@@ -163,9 +164,16 @@ button {
 
 /* ---------- Layout ---------- */
 .container {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 24px;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px;
+  }
 }
 
 .page {
@@ -200,6 +208,7 @@ button {
   border-radius: var(--radius-lg);
   background: linear-gradient(180deg, var(--surface-raised), var(--surface));
   padding: 2px;
+  overflow: hidden;
 }
 
 .marquee-frame::before {
@@ -356,8 +365,14 @@ button {
 /* ---------- Row of movie cards ---------- */
 .movie-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .movie-row {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
 }
 
 /* ---------- Navbar ---------- */
@@ -396,7 +411,7 @@ button {
 
 .navbar-links {
   display: flex;
-  gap: 28px;
+  gap: 24px;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-muted);
@@ -422,6 +437,34 @@ button {
 
 .icon-btn:hover {
   border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ---------- Responsive Navbar Menu ---------- */
+@media (max-width: 900px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: inline-flex !important;
+  }
+}
+
+.mobile-nav-drawer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.5rem;
+}
+
+.mobile-nav-drawer a {
+  padding: 8px 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mobile-nav-drawer a:hover {
   color: var(--gold);
 }
 
@@ -501,7 +544,7 @@ button {
   border-color: var(--gold-dim);
 }
 
-/* ---------- Section heading with hero marquee treatment ---------- */
+/* ---------- Section heading ---------- */
 .section-heading {
   display: flex;
   align-items: baseline;
@@ -527,8 +570,13 @@ button {
   padding: 48px 0 24px;
 }
 
+.hero-content {
+  padding: 48px 40px;
+  position: relative;
+}
+
 .hero-title {
-  font-size: clamp(40px, 7vw, 84px);
+  font-size: clamp(36px, 7vw, 84px);
   margin: 12px 0 16px;
 }
 
@@ -551,6 +599,56 @@ button {
   border-radius: 50%;
   background: var(--gold);
   box-shadow: 0 0 8px var(--gold);
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .hero-content {
+    padding: 24px 16px;
+  }
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .hero-actions .btn,
+  .hero-actions button,
+  .hero-actions a {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+/* ---------- Daily Pick Card Responsive Layout ---------- */
+.daily-pick-inner {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: center;
+}
+
+.daily-pick-img {
+  width: 90px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  .daily-pick-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .daily-pick-img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+  }
 }
 
 /* ---------- Loading / skeleton ---------- */
@@ -597,25 +695,6 @@ html[data-font-scale="normal"] { font-size: 16px; }
 html[data-font-scale="large"] { font-size: 18px; }
 html[data-font-scale="x-large"] { font-size: 20px; }
 
-/* ---------- Accessibility: skip-to-content link ---------- */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 12px;
-  background: var(--gold);
-  color: #14161F;
-  padding: 10px 18px;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 14px;
-  z-index: 1000;
-  transition: top 150ms ease;
-}
-
-.skip-link:focus {
-  top: 12px;
-}
-
 /* ---------- Accessibility: screen-reader-only text ---------- */
 .sr-only {
   position: absolute;
@@ -641,4 +720,3 @@ html[data-font-scale="x-large"] { font-size: 20px; }
     transform: translateY(-5px);
   }
 }
-/* ---------- Translation status pill (see TranslationStatus.jsx) uses inline styles, no CSS needed here ---------- */
