@@ -32,6 +32,8 @@ export default function MovieDetails() {
   const [showTrailer, setShowTrailer] = useState(false)
   const [activeTrailer, setActiveTrailer] = useState(null)
   const [aiSummary, setAiSummary] = useState(null)
+  const [aiRatingPrediction, setAiRatingPrediction] = useState(null)
+  const [showPredictionModal, setShowPredictionModal] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -52,6 +54,18 @@ export default function MovieDetails() {
       if (isAuthenticated && movieData) {
         libraryService.trackRecentlyViewed(movieData, mediaType).catch(() => {})
       }
+
+      // Fetch AI Rating Prediction
+      movieService.predictRating({
+        vote_average: movieData.vote_average || 7.0,
+        vote_count: movieData.vote_count || 500,
+        runtime: movieData.runtime || (movieData.episode_run_time ? movieData.episode_run_time[0] : 110),
+        budget: movieData.budget || 0,
+        popularity: movieData.popularity || 20.0
+      }).then((res) => {
+        setAiRatingPrediction(res)
+      }).catch(() => setAiRatingPrediction(null))
+
     }).catch(() => {
       setLoading(false)
     })
@@ -178,6 +192,7 @@ export default function MovieDetails() {
                 flexWrap: 'wrap',
                 marginBottom: 20,
                 fontSize: 14,
+                alignItems: 'center'
               }}
             >
               <span>
@@ -185,9 +200,33 @@ export default function MovieDetails() {
                 <span className="muted">({movie.vote_count?.toLocaleString()} votes)</span>
               </span>
 
+              {aiRatingPrediction && (
+                <button
+                  onClick={() => setShowPredictionModal(true)}
+                  style={{
+                    background: 'rgba(232, 176, 75, 0.15)',
+                    border: '1px solid var(--gold-dim)',
+                    color: 'var(--gold)',
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'transform 0.15s ease, background 0.15s ease'
+                  }}
+                  title="Click to view AI prediction reasoning & breakdown"
+                >
+                  <span>🤖 AI Predicted Rating: <strong>{aiRatingPrediction.predicted_rating} / 10</strong></span>
+
+                </button>
+              )}
+
               {mediaType === 'tv' && movie.number_of_seasons ? (
                 <span className="muted">
-                  {movie.number_of_seasons} Season{movie.number_of_seasons > 1 ? 's' : ''} • {movie.number_of_episodes} Episodes
+                  {movie.number_of_seasons} Season{movie.number_of_seasons > 1 ? 's' : ''} · {movie.number_of_episodes} Episodes
                 </span>
               ) : formatRuntime(displayRuntime) ? (
                 <span className="muted">{formatRuntime(displayRuntime)}</span>
@@ -349,6 +388,90 @@ export default function MovieDetails() {
 
         <AiRecommendations movieId={movie.id} />
       </div>
+
+      {/* AI Prediction Breakdown Modal */}
+      {showPredictionModal && aiRatingPrediction && (
+        <div
+          onClick={() => setShowPredictionModal(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.8)',
+            zIndex: 110,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="card"
+            style={{
+              width: '100%',
+              maxWidth: 500,
+              padding: 28,
+              background: 'var(--surface)',
+              border: '1px solid var(--gold-dim)',
+              boxShadow: '0 12px 40px rgba(0,0,0,0.6)',
+              position: 'relative'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <span className="eyebrow">🤖 AI Rating Breakdown</span>
+                <h3 style={{ fontSize: 22, margin: '4px 0 0', fontFamily: 'var(--font-display)', letterSpacing: '0.04em' }}>
+                  Why {aiRatingPrediction.predicted_rating} / 10?
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowPredictionModal(false)}
+                className="icon-btn"
+                style={{ width: 32, height: 32, fontSize: 14 }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="muted" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 20 }}>
+              Our machine learning heuristic analyzed production metrics, runtime balance, budget engagement, and historical viewer trends for <strong>{displayTitle}</strong>.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
+                <span>Baseline TMDB Rating</span>
+                <strong style={{ fontFamily: 'var(--font-mono)' }}>{movie.vote_average?.toFixed(1) || '7.0'} ★</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
+                <span>Popularity Engagement Factor</span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--success)' }}>+{((movie.popularity || 20) / 100 * 0.5).toFixed(2)}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
+                <span>Production Budget Scale</span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: movie.budget > 50000000 ? 'var(--success)' : 'var(--text-muted)' }}>
+                  {movie.budget > 50000000 ? '+0.30 (Blockbuster)' : '0.00 (Standard)'}
+                </strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
+                <span>Runtime Optimization (90-180m)</span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: (displayRuntime >= 90 && displayRuntime <= 180) ? 'var(--success)' : 'var(--ticket-red)' }}>
+                  {(displayRuntime >= 90 && displayRuntime <= 180) ? '+0.20 (Optimal)' : '-0.20 (Atypical)'}
+                </strong>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowPredictionModal(false)}
+                style={{ width: '100%' }}
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showTrailer && activeTrailer && (
         <div
