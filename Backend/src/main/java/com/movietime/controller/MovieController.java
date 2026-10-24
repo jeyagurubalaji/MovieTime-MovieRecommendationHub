@@ -91,4 +91,26 @@ public class MovieController {
         return tmdbService.getCredits(id)
                 .map(node -> mapper.convertValue(node, Object.class));
     }
+    @GetMapping("/predict-rating")
+    public Mono<Object> predictRating(
+            @RequestParam(defaultValue = "7.0") double voteAverage,
+            @RequestParam(defaultValue = "500") int voteCount,
+            @RequestParam(defaultValue = "110") int runtime,
+            @RequestParam(defaultValue = "0") long budget,
+            @RequestParam(defaultValue = "20.0") double popularity) {
+
+        org.springframework.web.reactive.function.client.WebClient webClient =
+                org.springframework.web.reactive.function.client.WebClient.create("http://localhost:8000");
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/predict-rating")
+                        .queryParam("vote_average", voteAverage)
+                        .queryParam("vote_count", voteCount)
+                        .queryParam("runtime", runtime)
+                        .queryParam("budget", budget)
+                        .queryParam("popularity", popularity)
+                        .build())
+                .retrieve()
+                .bodyToMono(Object.class);
+    }
 }
