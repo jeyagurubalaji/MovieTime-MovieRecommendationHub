@@ -37,6 +37,10 @@ export const movieService = {
   // Dynamically fetch Oscar-winning actor or actress filmography
   personOscarCredits: (personId) =>
     api.get(`/people/${personId}/oscar-credits`).then((r) => r.data),
+
+  // AI Rating Prediction API Call
+    predictRating: (movieParams) =>
+      api.get('/movies/predict-rating', { params: movieParams }).then((r) => r.data),
 }
 
 export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p'
