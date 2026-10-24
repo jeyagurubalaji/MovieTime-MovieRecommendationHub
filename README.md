@@ -7,6 +7,7 @@ MovieTime is a full-stack AI-powered movie discovery platform for exploring movi
 * 🎥 Movie & TV Series Discovery
 * 🤖 AI-Powered Recommendations
 * 💬 AI Movie Assistant
+* 📊 AI Movie Rating Prediction & Score Breakdown
 * 🎭 Mood-Based Recommendations
 * 🔍 Search & Movie Details
 * ❤️ Favorites & Watchlist
