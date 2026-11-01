@@ -118,6 +118,8 @@ export default function MovieDetails() {
   const displayDate = movie.release_date || movie.first_air_date
   const displayRuntime = movie.runtime || (movie.episode_run_time ? movie.episode_run_time[0] : null)
 
+  const breakdown = aiRatingPrediction?.breakdown || {}
+
   return (
     <div className="page">
       <div
@@ -220,7 +222,6 @@ export default function MovieDetails() {
                   title="Click to view AI prediction reasoning & breakdown"
                 >
                   <span>🤖 AI Predicted Rating: <strong>{aiRatingPrediction.predicted_rating} / 10</strong></span>
-
                 </button>
               )}
 
@@ -409,7 +410,9 @@ export default function MovieDetails() {
             className="card"
             style={{
               width: '100%',
-              maxWidth: 500,
+              maxWidth: 520,
+              maxHeight: '90vh',
+              overflowY: 'auto',
               padding: 28,
               background: 'var(--surface)',
               border: '1px solid var(--gold-dim)',
@@ -434,17 +437,27 @@ export default function MovieDetails() {
             </div>
 
             <p className="muted" style={{ fontSize: 13, lineHeight: 1.5, marginBottom: 20 }}>
-              Our machine learning heuristic analyzed production metrics, runtime balance, budget engagement, and historical viewer trends for <strong>{displayTitle}</strong>.
+              Advanced ML heuristic analysis of production metrics, runtime balance, budget scale, vote reliability, and genre trends for <strong>{displayTitle}</strong>.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 14 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
                 <span>Baseline TMDB Rating</span>
-                <strong style={{ fontFamily: 'var(--font-mono)' }}>{movie.vote_average?.toFixed(1) || '7.0'} ★</strong>
+                <strong style={{ fontFamily: 'var(--font-mono)' }}>{breakdown.base_score || movie.vote_average?.toFixed(1) || '7.0'} ★</strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
                 <span>Popularity Engagement Factor</span>
-                <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--success)' }}>+{((movie.popularity || 20) / 100 * 0.5).toFixed(2)}</strong>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--success)' }}>+{breakdown.popularity_bonus || 0.00}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
+                <span>Genre Historical Sentiment</span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--success)' }}>+{breakdown.genre_sentiment_boost || 0.25}</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
+                <span>Vote Sample Reliability</span>
+                <strong style={{ fontFamily: 'var(--font-mono)', color: (breakdown.vote_confidence_bonus >= 0) ? 'var(--success)' : 'var(--ticket-red)' }}>
+                  {breakdown.vote_confidence_bonus >= 0 ? `+${breakdown.vote_confidence_bonus}` : breakdown.vote_confidence_bonus}
+                </strong>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-raised)', borderRadius: 6 }}>
                 <span>Production Budget Scale</span>
