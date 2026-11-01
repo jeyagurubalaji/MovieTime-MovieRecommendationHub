@@ -1,11 +1,12 @@
 package com.movietime.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.movietime.service.TmdbService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -14,6 +15,9 @@ public class MovieController {
 
     private final TmdbService tmdbService;
     private final ObjectMapper mapper = new ObjectMapper();
+
+    @Value("${ai.service.base-url:http://localhost:8000}")
+    private String aiServiceBaseUrl;
 
     @GetMapping("/trending")
     public Mono<Object> trending(@RequestParam(defaultValue = "week") String window,
@@ -58,7 +62,6 @@ public class MovieController {
                 .map(node -> mapper.convertValue(node, Object.class));
     }
 
-    // NEW: Added endpoint for watch providers to stop the 500 Error
     @GetMapping("/{id}/watch/providers")
     public Mono<Object> getWatchProviders(@PathVariable long id, @RequestParam(defaultValue = "movie") String type) {
         return tmdbService.getWatchProviders(id, type)
@@ -91,6 +94,7 @@ public class MovieController {
         return tmdbService.getCredits(id)
                 .map(node -> mapper.convertValue(node, Object.class));
     }
+
     @GetMapping("/predict-rating")
     public Mono<Object> predictRating(
             @RequestParam(defaultValue = "7.0") double voteAverage,
@@ -99,8 +103,7 @@ public class MovieController {
             @RequestParam(defaultValue = "0") long budget,
             @RequestParam(defaultValue = "20.0") double popularity) {
 
-        org.springframework.web.reactive.function.client.WebClient webClient =
-                org.springframework.web.reactive.function.client.WebClient.create("http://localhost:8000");
+        WebClient webClient = WebClient.create(aiServiceBaseUrl);
 
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/predict-rating")
