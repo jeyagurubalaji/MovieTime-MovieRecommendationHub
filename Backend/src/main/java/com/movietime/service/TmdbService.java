@@ -96,11 +96,10 @@ public class TmdbService {
     public Mono<JsonNode> searchMovies(String query, int page) {
         return executeWithRetry(webClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/search/movie")
+                        .path("/search/multi")
                         .queryParam("api_key", apiKey)
                         .queryParam("query", query)
                         .queryParam("page", page)
-                        .queryParam("include_adult", false)
                         .build())
                 .retrieve());
     }
@@ -112,7 +111,6 @@ public class TmdbService {
                         .queryParam("api_key", apiKey)
                         .queryParam("query", query)
                         .queryParam("page", page)
-                        .queryParam("include_adult", false)
                         .build())
                 .retrieve());
     }
@@ -123,9 +121,9 @@ public class TmdbService {
                         .path("/discover/movie")
                         .queryParam("api_key", apiKey)
                         .queryParam("with_genres", genreId)
-                        .queryParam("sort_by", "primary_release_date.desc")
-                        .queryParam("primary_release_date.lte", LocalDate.now().toString())
-                        .queryParam("vote_count.gte", 10)
+                        .queryParam("sort_by", "primary_release_date.desc") // Prioritize Newest
+                        .queryParam("primary_release_date.lte", LocalDate.now().toString()) // Prevents unreleased
+                        .queryParam("vote_count.gte", 10) // Prevents empty obscure junk
                         .queryParam("page", page)
                         .build())
                 .retrieve());
@@ -151,6 +149,7 @@ public class TmdbService {
                     uriBuilder.path("/discover/movie")
                             .queryParam("api_key", apiKey)
                             .queryParam("page", page)
+                            // Override default popularity.desc to primary_release_date.desc
                             .queryParam("sort_by", sortBy != null ? sortBy : "primary_release_date.desc")
                             .queryParam("primary_release_date.lte", LocalDate.now().toString())
                             .queryParam("vote_count.gte", 10);
@@ -288,7 +287,6 @@ public class TmdbService {
                         .build())
                 .retrieve());
     }
-
     public Mono<JsonNode> getListDetails(String listId) {
         return executeWithRetry(webClient.get()
                 .uri(uriBuilder -> uriBuilder
