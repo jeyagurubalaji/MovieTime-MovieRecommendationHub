@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { movieService, posterUrl } from '../services/movieService'
 import MovieCard from '../components/MovieCard.jsx'
 import FilterPanel from '../components/FilterPanel.jsx'
@@ -106,7 +106,8 @@ function PersonResults({ people, jobFilter }) {
 
     // STRICT FILTERS APPLIED HERE
     const filteredCredits = credits.filter(c => {
-      // 1. Block excluded genres (Talk Shows, News, Reality, Docs)
+1.       //Block excluded genres (Talk Shows, News, Reality, Docs)
+
       if (c.genre_ids && c.genre_ids.some(id => EXCLUDED_GENRES.includes(id))) {
         return false;
       }
@@ -174,58 +175,13 @@ export default function Search() {
   const [loading, setLoading] = useState(false)
   const [searched, setSearched] = useState(false)
 
-  // Autocomplete suggestions state
-  const [suggestions, setSuggestions] = useState({ movies: [], people: [] })
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const searchWrapperRef = useRef(null)
-  const navigate = useNavigate()
-
   const [filters, setFilters] = useState({ sortBy: 'primary_release_date.desc' })
   const [filterResults, setFilterResults] = useState([])
   const [filterLoading, setFilterLoading] = useState(false)
 
-  // Close suggestions when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (searchWrapperRef.current && !searchWrapperRef.current.contains(event.target)) {
-        setShowSuggestions(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
-  // Live Autocomplete Debounce Effect
-  useEffect(() => {
-    if (!query.trim() || query.length < 2 || activeTab === 'ai' || activeTab === 'genre') {
-      setSuggestions({ movies: [], people: [] })
-      setShowSuggestions(false)
-      return
-    }
-
-    const timer = setTimeout(() => {
-      if (activeTab === 'title') {
-        movieService.searchMovies(query, 1).then((res) => {
-          const filtered = (res.results || []).filter(item => item.media_type !== 'person' && item.poster_path).slice(0, 5)
-          setSuggestions({ movies: filtered, people: [] })
-          setShowSuggestions(true)
-        }).catch(() => {})
-      } else if (activeTab === 'actor' || activeTab === 'director') {
-        movieService.searchPeople(query, 1).then((res) => {
-          const filtered = (res.results || []).filter(p => p.profile_path).slice(0, 5)
-          setSuggestions({ movies: [], people: filtered })
-          setShowSuggestions(true)
-        }).catch(() => {})
-      }
-    }, 250)
-
-    return () => clearTimeout(timer)
-  }, [query, activeTab])
-
   const handleSearch = async (e) => {
     e?.preventDefault()
     if (!query.trim()) return
-    setShowSuggestions(false)
     setLoading(true)
     setSearched(true)
     if (activeTab === 'title') {
@@ -264,7 +220,7 @@ export default function Search() {
           {TABS.map((t) => (
             <button
               key={t.key}
-              onClick={() => { setActiveTab(t.key); setSearched(false); setResults([]); setPeople([]); setShowSuggestions(false); setQuery('') }}
+              onClick={() => { setActiveTab(t.key); setSearched(false); setResults([]); setPeople([]) }}
               className={activeTab === t.key ? 'btn btn-primary' : 'btn btn-outline'}
               style={{ padding: '8px 16px', fontSize: 13 }}
             >
@@ -277,80 +233,19 @@ export default function Search() {
           <AiDescriptionSearch />
         ) : activeTab !== 'genre' ? (
           <>
-            <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, marginBottom: 28, position: 'relative' }} ref={searchWrapperRef}>
-              <div style={{ flex: 1, position: 'relative' }}>
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onFocus={() => { if (query.length >= 2) setShowSuggestions(true) }}
-                  placeholder={
-                    activeTab === 'title' ? 'Search by movie title…' :
-                    activeTab === 'actor' ? 'Search by actor name…' : 'Search by director name…'
-                  }
-                  style={{
-                    width: '100%', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
-                    padding: '12px 16px', color: 'var(--text)', fontSize: 14, outline: 'none'
-                  }}
-                />
-
-                {/* Auto-suggestion Dropdown */}
-                {showSuggestions && (suggestions.movies.length > 0 || suggestions.people.length > 0) && (
-                  <div
-                    className="card"
-                    style={{
-                      position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0,
-                      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10,
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.5)', zIndex: 100, maxHeight: 320, overflowY: 'auto', padding: '6px 0'
-                    }}
-                  >
-                    {activeTab === 'title' && suggestions.movies.map((m) => (
-                      <div
-                        key={m.id}
-                        onClick={() => {
-                          setShowSuggestions(false)
-                          navigate(`/movie/${m.id}`)
-                        }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', cursor: 'pointer' }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface-raised)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        <img src={posterUrl(m.poster_path, 'w92')} alt={m.title || m.name} style={{ width: 26, height: 38, objectFit: 'cover', borderRadius: 4 }} />
-                        <div style={{ overflow: 'hidden' }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {m.title || m.name}
-                          </div>
-                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                            {(m.release_date || m.first_air_date || '').slice(0, 4)} ★ {m.vote_average?.toFixed(1)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                    {(activeTab === 'actor' || activeTab === 'director') && suggestions.people.map((p) => (
-                      <div
-                        key={p.id}
-                        onClick={() => {
-                          setShowSuggestions(false)
-                          navigate(`/person/${p.id}`)
-                        }}
-                        style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', cursor: 'pointer' }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'var(--surface-raised)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        <img src={posterUrl(p.profile_path, 'w92')} alt={p.name} style={{ width: 32, height: 32, objectFit: 'cover', borderRadius: '50%' }} />
-                        <div style={{ overflow: 'hidden' }}>
-                          <div style={{ fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {p.name}
-                          </div>
-                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                            {p.known_for_department || 'Artist'}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <form onSubmit={handleSearch} style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={
+                  activeTab === 'title' ? 'Search by movie title…' :
+                  activeTab === 'actor' ? 'Search by actor name…' : 'Search by director name…'
+                }
+                style={{
+                  flex: 1, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8,
+                  padding: '12px 16px', color: 'var(--text)', fontSize: 14,
+                }}
+              />
               <button type="submit" className="btn btn-primary">Search</button>
             </form>
 
