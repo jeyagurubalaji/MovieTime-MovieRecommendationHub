@@ -4,7 +4,6 @@ import { useTheme } from '../context/ThemeContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import LanguageSwitcher from './LanguageSwitcher.jsx'
 import UserProfileMenu from './UserProfileMenu.jsx'
-import SearchAutocomplete from './SearchAutocomplete.jsx' // 👈 NEW IMPORT
 
 export default function Navbar() {
   const { theme, toggleTheme } = useTheme()
@@ -34,9 +33,7 @@ export default function Navbar() {
         </nav>
 
         {/* Laptop Right Control Actions */}
-        <div className="navbar-actions desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <SearchAutocomplete /> {/* 👈 NEW LIVE SEARCH AUTOCOMPLETE */}
-
+        <div className="navbar-actions desktop-only">
           <LanguageSwitcher />
 
           <button
@@ -73,9 +70,6 @@ export default function Navbar() {
       {/* Mobile Drawer Navigation */}
       {isOpen && (
         <nav className="mobile-nav-drawer mobile-only" aria-label="Mobile navigation">
-          <div style={{ padding: '0 4px', marginBottom: '12px' }}>
-            <SearchAutocomplete />
-          </div>
           <Link to="/" onClick={closeMenu}>Home</Link>
           <Link to="/search" onClick={closeMenu}>Search</Link>
           <Link to="/categories" onClick={closeMenu}>Categories</Link>
