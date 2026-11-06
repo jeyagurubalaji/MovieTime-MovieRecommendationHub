@@ -19,10 +19,13 @@ export const movieService = {
     api.get(`/movies/${id}/watch/providers`, { params: { type } }).then((r) => r.data),
   discoverByGenre: (genreId, page = 1) =>
     api.get('/movies/discover', { params: { genreId, page } }).then((r) => r.data),
+
+  // Explicitly ensure query parameters are passed securely
   searchMovies: (query, page = 1) =>
-    api.get('/search/movies', { params: { query, page } }).then((r) => r.data),
+    api.get('/search/movies', { params: { query: query.trim(), page } }).then((r) => r.data),
   searchPeople: (query, page = 1) =>
-    api.get('/search/people', { params: { query, page } }).then((r) => r.data),
+    api.get('/search/people', { params: { query: query.trim(), page } }).then((r) => r.data),
+
   credits: (id) =>
     api.get(`/movies/${id}/credits`).then((r) => r.data),
   personDetails: (id) =>
@@ -39,8 +42,8 @@ export const movieService = {
     api.get(`/people/${personId}/oscar-credits`).then((r) => r.data),
 
   // AI Rating Prediction API Call
-    predictRating: (movieParams) =>
-      api.get('/movies/predict-rating', { params: movieParams }).then((r) => r.data),
+  predictRating: (movieParams) =>
+    api.get('/movies/predict-rating', { params: movieParams }).then((r) => r.data),
 }
 
 export const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p'
